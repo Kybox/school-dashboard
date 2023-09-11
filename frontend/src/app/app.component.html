@@ -1,0 +1,44 @@
+<header class="hero is-flex-direction-row is-align-items-center">
+  <div class="hero-body">
+    <p class="title">
+      Tableau de bord scolaire
+    </p>
+    <p class="subtitle">
+      Organisez vos cours par inscriptions
+    </p>
+    <small>Textes générés par OpenAI ChatGPT 3.5</small>
+  </div>
+  <div class="student is-flex is-flex-direction-row pr-6" *ngIf="student !== undefined">
+    <div class="is-flex is-flex-direction-column is-justify-content-flex-end is-align-content-flex-end">
+      <p class="title is-4">{{student.name}}</p>
+      <p class="subtitle is-6">@{{student.name}}</p>
+    </div>
+    <div><img [src]="['/assets/img/' + student.avatar]" alt="Student image" class="image ml-2"></div>
+  </div>
+</header>
+<navigation />
+<main>
+  <div #contentRef class="content m-6">
+    <router-outlet />
+  </div>
+  <div class="wrapper-loader is-flex is-justify-content-center m-6" *ngIf="displayLoader">
+    <div class="lds-ring">
+      <div></div>
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+</main>
+<div class="content">
+  <blockquote class="p-3">
+    <small>Application de démonstration</small><br>
+    <small>Frontend Angular 16 / RxJS</small><br>
+    <small>Backend Java 17 - Spring Webflux / R2DB</small>
+  </blockquote>
+</div>
+<footer class="footer p-0 has-background-white">
+  <div class="content has-text-centered">
+    <img src="/assets/img/logo-kybox-small.jpg" width="183" height="90" alt="kybox-logo">
+  </div>
+</footer>

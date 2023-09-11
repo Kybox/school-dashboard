@@ -1,0 +1,21 @@
+.top-right {
+    width: 100%;
+}
+
+.desc {
+    text-indent: 5%;
+}
+
+.dropdown-item {
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    box-shadow: inset 0 0 5px 1px rgba(10, 10, 10, .1);
+}
+
+.info {
+    text-align: center;
+    margin-left: 20px;
+    font-weight: bold;
+}

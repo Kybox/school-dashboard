@@ -1,0 +1,15 @@
+.display {
+    display: block;
+}
+
+.subtitle {
+    margin-bottom: 0;
+}
+
+.wrapper-loader {
+    width: 100;
+}
+
+.image {
+    height: 120px;
+}

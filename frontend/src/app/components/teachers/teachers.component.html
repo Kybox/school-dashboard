@@ -1,0 +1,33 @@
+<ng-container *ngIf="personList !== undefined">
+    <h2 class="mb-5">Sélectionner un enseignant</h2>
+    <p class="desc">
+        La sélection d'un enseignant pour accéder à ses cours revêt une importance cruciale dans le processus éducatif.
+        Un enseignant compétent et qualifié peut être la clé pour offrir une expérience d'apprentissage enrichissante.
+        Il est essentiel de choisir un enseignant dont les compétences, les connaissances et le style d'enseignement
+        correspondent aux besoins et aux objectifs des étudiants.
+    </p>
+    <p class="desc">
+        En sélectionnant un enseignant approprié, les
+        apprenants peuvent maximiser leur compréhension du sujet, leur motivation et leur engagement. De plus, un
+        enseignant expérimenté peut adapter son enseignement en fonction des besoins individuels, créant ainsi une
+        expérience d'apprentissage plus personnalisée et efficace. En fin de compte, le choix de l'enseignant joue un
+        rôle central dans la réussite éducative.
+    </p>
+    <div class="is-flex is-flex-direction-row is-flex-wrap-wrap is-justify-content-center mt-6">
+        <div class="card m-4" *ngFor="let person of personList">
+            <div class="card-content" [routerLink]="['/courses/teacher/' + person.id]">
+                <div class="media">
+                    <div class="media-left">
+                        <figure class="image is-48x48">
+                            <img [src]="['/assets/img/' + person.avatar]" alt="Placeholder image">
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <p class="title is-4">{{person.name}}</p>
+                        <p class="subtitle is-6">{{person.subject?.label}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

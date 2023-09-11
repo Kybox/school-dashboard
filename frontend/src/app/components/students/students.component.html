@@ -1,0 +1,24 @@
+<ng-container *ngIf="personList !== undefined">
+    <h2 class="mb-5">Sélectionner un étudiant</h2>
+    <p>
+        Incarnez le rôle d'un étudiant parmi la liste proposée ci-dessous, pour ensuite pouvoir s'inscrire à l'un des
+        cours proposés par un enseignant, en vue de simuler le processus d'inscription.
+    </p>
+    <div class="is-flex is-flex-direction-row is-flex-wrap-wrap is-justify-content-center">
+        <div class="card m-4" *ngFor="let person of personList; index as i" (click)="click(i)">
+            <div class="card-content">
+                <div class="media">
+                    <div class="media-left">
+                        <figure class="image is-48x48">
+                            <img [src]="['/assets/img/' + person.avatar]" alt="Placeholder image">
+                        </figure>
+                    </div>
+                    <div class="media-content">
+                        <p class="title is-4">{{person.name}}</p>
+                        <p class="subtitle is-6">@{{person.name}}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>

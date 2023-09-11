@@ -1,0 +1,163 @@
+<div class="content">
+    <div class="box">
+        <blockquote>
+            L'application globale est divisée en deux conteneurs Docker. Un conteneur pour l'application frontend et un
+            second pour l'application backend qui incorpore une base de donnée H2 en mémoire. Ces deux conteneurs sont
+            hébergés dans deux services Cloud Run (stateless) distincts de Google Cloud Platform, avec un démarrage à
+            froid (ce qui explique un
+            temps de réponse allongé à la première requête le temps que les applications démarrent).
+        </blockquote>
+        <h2>Informations sur le code source</h2>
+        <p>
+            Sur cette section de l'application, quelques-uns des morceaux de code les plus
+            essentiels utilisés dans le développement y sont dévoilés. Le choix s'est porté sur Java, associé à WebFlux
+            (du framework Spring) pour une gestion asynchrone des données, ainsi qu'une intégration harmonieuse avec
+            Angular, sa bibliothèque RxJS et l'interface EventSource.
+        </p>
+        <p>
+            Les extraits de code qui suivent illustrent l'approche de développement
+            axée sur la réactivité. Ils constituent la base de l'application, permettant une
+            interaction fluide tout en garantissant une gestion asynchrone des données de bout en bout, améliorant
+            ainsi l'expérience globale de l'application.
+        </p>
+        <h3>Frontend request with RxJS Observable and Observer</h3>
+        <pre>
+            public getStudents(): Observable&lt;Person&gt; {{ '{' }}
+                return this.initRequest(this.rootUrl + 'students');
+            {{ '}' }};
+
+            private initRequest(url: string): Observable&lt;any&gt; {{ '{' }}
+                return new Observable&lt;Person&gt;((subscriber: Observer&lt;any&gt;) => {{ '{' }}
+                    const source:EventSource = new EventSource(url);
+                    source.onmessage = (evt: MessageEvent) =&gt; this.ngZone.run(() => subscriber.next(JSON.parse(evt.data)));
+                    source.onopen = (evt: Event) =&gt; console.debug('[API SERVICE] - STREAM OPENED');
+                    source.onerror = (evt) =&gt; {{ '{' }}
+                        console.debug('[API SERVICE] - STREAM CLOSED');
+                        source.close();
+                    {{ '}' }};
+                {{ '}' }});
+            {{ '}' }}
+        </pre>
+        <h3>Backend : response with Flux in SSE response</h3>
+        <pre>
+            // RouterFunction
+            // Functional Endpoints
+
+            @Bean
+            public RouterFunction&lt;ServerResponse&gt; router() {{ '{' }}
+                return route()
+                    .GET(&quot;/students&quot;,
+                            req -&gt; ok().contentType(MediaType.TEXT_EVENT_STREAM)
+                                    .body(BodyInserters.fromProducer(this.personService
+                                            .findByRole(RoleEnum.STUDENT.toString()), Person.class)))
+            {{ '}' }}
+        </pre>
+        <pre>
+            // Service implementation
+
+            @Override
+            public Flux&lt;Person&gt; findByRole(String label) {{ '{' }}
+                var roleRef = new AtomicReference&lt;Role&gt;();
+                return this.roleRepository.findByLabel(label)
+                        .log()
+                        .map(role -&gt; {{ '{' }}
+                            roleRef.set(role);
+                            return role;
+                        {{ '}' }}).flux()
+                        .flatMap(role -&gt; this.personRepository.findByRoleId(role.getId()))
+                        .delayElements(Duration.ofMillis(200)) // <- SOFT SIMULATION
+                        .map(person -&gt; {{ '{' }}
+                            person.setRole(roleRef.get());
+                            return person;
+                        {{ '}' }})
+                        .flatMap(person -> {{ '{' }}
+                            if(person.getSubjectId() != null)
+                            return this.subjectRepository.findById(person.getSubjectId())
+                                    .map(subject -&gt; {{ '{' }}
+                                        person.setSubject(subject);
+                                        return person;
+                                    {{ '}' }});
+                            else return Mono.just(person);
+                        {{ '}' }});
+            {{ '}' }}
+        </pre>
+        <pre>
+            @Repository
+            public interface PersonRepository extends ReactiveCrudRepository&lt;Person, Long&gt; {{ '{' }}
+
+                @Query("SELECT * FROM person WHERE role_id = :1")
+                Flux&lt;Person&gt; findByRoleId(Long roleId);
+            {{ '}' }}
+        </pre>
+        <pre>
+            // Entity
+
+            @Table("person")
+            @Data
+            @NoArgsConstructor
+            public class Person {{ '{' }}
+
+                @Id
+                private Long id;
+                private String name;
+                private String avatar;
+
+                @Column("role_id")
+                @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+                private Long roleId;
+
+                @Transient
+                private Role role;
+
+                @Column("subject_id")
+                @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+                private Long subjectId;
+
+                @Transient
+                @JsonInclude(JsonInclude.Include.NON_NULL)
+                private Subject subject;
+
+                @Transient
+                @JsonInclude(JsonInclude.Include.NON_NULL)
+                private List&lt;Course&gt; courseSubList;
+
+                public Person(String name, Long roleId, String avatar){{ '{' }}
+                    this.name = name;
+                    this.roleId = roleId;
+                    this.avatar = avatar;
+                {{ '}' }}
+
+                public Person(String name, Long roleId, Long subjectId, String avatar){{ '{' }}
+                    this.name = name;
+                    this.roleId = roleId;
+                    this.subjectId = subjectId;
+                    this.avatar = avatar;
+                {{ '}' }}
+            {{ '}' }}
+        </pre>
+        <h3>Frontend : response subscription</h3>
+        <pre>
+            import {{ '{' }} inject, OnInit, OnDestroy {{ '}' }} from '@angular/core';
+
+            import {{ '{' }} Subscription {{ '}' }} from 'rxjs';
+            import {{ '{' }} Person {{ '}' }} from 'src/app/shared/model/person';
+            import {{ '{' }} ServiceAPI {{ '}' }} from 'src/app/shared/services/api.service';
+
+            public personList: Person[] = [];
+            
+            private apiSubscription!: Subscription;
+            private apiService: ServiceAPI = inject(ServiceAPI);
+
+            constructor() {{ '{' }}{{ '}' }}
+
+            public ngOnInit(): void {{ '{' }}
+                this.apiSubscription = this.apiService.getStudents()
+                    .subscribe((res: Person) =&gt; this.personList.push(res));
+            {{ '}' }}
+
+            public ngOnDestroy(): void {{ '{' }}
+                this.apiSubscription.unsubscribe();
+            {{ '}' }}
+        </pre>
+    </div>
+</div>

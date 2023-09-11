@@ -1,0 +1,51 @@
+<ng-container *ngIf=" subList !== undefined">
+    <div class="container is-flex is-align-items-center is-justify-content-space-between">
+        <div class="top-left">
+            <h2 class="mb-5">Liste des inscriptions</h2>
+            <div class="container">
+                <div #dropdown class="dropdown" (click)="clickDropdown()">
+                    <div class="dropdown-trigger">
+                        <button class="button" aria-haspopup="true" aria-controls="dropdown-menu">
+                            <span>{{courseSelected ? courseSelected.title : 'Sélectionner'}}</span>
+                        </button>
+                    </div>
+                    <div class="dropdown-menu" id="dropdown-menu" role="menu">
+                        <div class="dropdown-content">
+                            <span class="dropdown-item" *ngFor="let course of courseList" (click)="clickCourse(course)">
+                                {{course.title}}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container m-6 is-flex is-align-items-center  is-justify-content-space-between" *ngIf="courseSelected">
+        <div>
+            {{courseSelected.description}}
+        </div>
+        <button class="button is-success is-medium is-light ml-6" *ngIf="student !== undefined"
+            (click)="subscribe()">S'inscrire</button>
+        <span *ngIf="student === undefined" class="info">Sélectionner un étudiant avant de vous inscrire.</span>
+    </div>
+    <div *ngIf="subList.length > 0">
+        <table class="table mt-5">
+            <thead>
+                <tr>
+                    <th><abbr title="N°">N°</abbr></th>
+                    <th><abbr title="Nom">Nom</abbr></th>
+                    <th><abbr title="Cours">Cours</abbr></th>
+                    <th><abbr title="Enseignant">Enseignant</abbr></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let sub of subList">
+                    <th>{{sub.id}}</th>
+                    <td>{{sub.person.name}}</td>
+                    <td>{{sub.course.title}}</td>
+                    <td>{{sub.course.teacher.name}}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</ng-container>

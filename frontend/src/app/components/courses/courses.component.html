@@ -1,0 +1,29 @@
+<ng-container *ngIf="courseList !== undefined">
+    <h2 class="mb-5">{{courseSelected ? courseSelected.title : 'Sélectionner un cours'}}</h2>
+    <p *ngIf="courseSelected === undefined">
+        Ici, vous trouverez une variété de cours captivants, dispensés par des enseignants passionnés et compétents. Que
+        vous cherchiez à approfondir vos compétences, à explorer de nouveaux domaines ou à élargir vos horizons, notre
+        catalogue de cours répondra à vos besoins. Choisissez parmi une gamme diversifiée de sujets, des sciences aux
+        arts, en passant par la technologie et bien plus encore. Laissez-vous inspirer par nos enseignants dévoués,
+        engagez-vous dans un voyage intellectuel et inscrivez-vous dès maintenant pour stimuler votre croissance
+        personnelle et professionnelle. Rejoignez-nous dans cette aventure éducative excitante !
+    </p>
+    <p *ngIf="courseSelected !== undefined">{{courseSelected.description}}</p>
+    <div class="is-flex is-flex-direction-row is-flex-wrap-wrap is-justify-content-center">
+        <div class="box m-4" *ngFor="let course of courseList" (click)="click(course)">
+            <div class="is-flex is-align-items-center">
+                <div class="media-left">
+                    <figure class="image is-48x48 ml-0 mr-0">
+                        <img src="/assets/img/math.jpg" alt="Placeholder image" *ngIf="course.subject.id === 1">
+                        <img src="/assets/img/phil.jpg" alt="Placeholder image" *ngIf="course.subject.id === 2">
+                        <img src="/assets/img/med.jpg" alt="Placeholder image" *ngIf="course.subject.id === 3">
+                    </figure>
+                </div>
+                <div class="">
+                    <p class="title is-4">{{course.title}}</p>
+                    <p class="subtitle is-6">{{course.subject.label}}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-container>
