@@ -1,6 +1,4 @@
-# school-dashboard
-
-### Backend
+# Java Backend with Spring boot
 
 This repository hosts a Java backend application built with the Spring framework. The application includes an in-memory H2 database and leverages reactive programming principles with the use of Spring Boot's WebFlux and R2DBC libraries.
 
