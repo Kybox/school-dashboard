@@ -41,7 +41,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "outputPath": "dist/school-dashboard",
+            "outputPath": "dist/school-dashboard/browser",
             "index": "src/index.html",
             "main": "src/main.ts",
             "polyfills": [
@@ -120,6 +120,60 @@
             ],
             "scripts": []
           }
+        },
+        "server": {
+          "builder": "@angular-devkit/build-angular:server",
+          "options": {
+            "outputPath": "dist/school-dashboard/server",
+            "main": "server.ts",
+            "tsConfig": "tsconfig.server.json"
+          },
+          "configurations": {
+            "production": {
+              "outputHashing": "media"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "sourceMap": true,
+              "extractLicenses": false,
+              "vendorChunk": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve-ssr": {
+          "builder": "@nguniversal/builders:ssr-dev-server",
+          "configurations": {
+            "development": {
+              "browserTarget": "school-dashboard:build:development",
+              "serverTarget": "school-dashboard:server:development"
+            },
+            "production": {
+              "browserTarget": "school-dashboard:build:production",
+              "serverTarget": "school-dashboard:server:production"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "prerender": {
+          "builder": "@nguniversal/builders:prerender",
+          "options": {
+            "routes": [
+              "/"
+            ]
+          },
+          "configurations": {
+            "production": {
+              "browserTarget": "school-dashboard:build:production",
+              "serverTarget": "school-dashboard:server:production"
+            },
+            "development": {
+              "browserTarget": "school-dashboard:build:development",
+              "serverTarget": "school-dashboard:server:development"
+            }
+          },
+          "defaultConfiguration": "production"
         }
       }
     }
