@@ -80,7 +80,13 @@
               "vendorChunk": true,
               "extractLicenses": false,
               "sourceMap": true,
-              "namedChunks": true
+              "namedChunks": true,
+              "fileReplacements": [
+                {
+                  "replace": "src/env/env.ts",
+                  "with": "src/env/env.dev.ts"
+                }
+              ]
             }
           },
           "defaultConfiguration": "production"

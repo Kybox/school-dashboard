@@ -27,14 +27,16 @@
             {{ '}' }};
 
             private initRequest(url: string): Observable&lt;any&gt; {{ '{' }}
-                return new Observable&lt;Person&gt;((subscriber: Observer&lt;any&gt;) => {{ '{' }}
-                    const source:EventSource = new EventSource(url);
-                    source.onmessage = (evt: MessageEvent) =&gt; this.ngZone.run(() => subscriber.next(JSON.parse(evt.data)));
-                    source.onopen = (evt: Event) =&gt; console.debug('[API SERVICE] - STREAM OPENED');
-                    source.onerror = (evt) =&gt; {{ '{' }}
-                        console.debug('[API SERVICE] - STREAM CLOSED');
-                        source.close();
-                    {{ '}' }};
+                return this.ngZone.runOutsideAngular(() => {{ '{' }} // Server Side Rendering
+                    return new Observable&lt;Person&gt;((subscriber: Observer&lt;any&gt;) => {{ '{' }}
+                        const source:EventSource = new EventSource(url);
+                        source.onmessage = (evt: MessageEvent) =&gt; this.ngZone.run(() => subscriber.next(JSON.parse(evt.data)));
+                        source.onopen = (evt: Event) =&gt; console.debug('[API SERVICE] - STREAM OPENED');
+                        source.onerror = (evt) =&gt; {{ '{' }}
+                            console.debug('[API SERVICE] - STREAM CLOSED');
+                            source.close();
+                        {{ '}' }};
+                    {{ '}' }});
                 {{ '}' }});
             {{ '}' }}
         </pre>

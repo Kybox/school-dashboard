@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { AfterViewInit, ChangeDetectorRef, Component, OnDestroy, inject } from '@angular/core';
-import { Observable, Subscription, interval, retry, take, timeout } from 'rxjs';
+import { AfterViewInit, Component, OnDestroy, inject } from '@angular/core';
+import { Subscription } from 'rxjs';
 import { CoreService } from 'src/app/core/services/core.service';
 import { Person } from 'src/app/shared/model/person';
 import { ServiceAPI } from 'src/app/shared/services/api.service';
@@ -16,14 +16,15 @@ export class StudentsComponent implements AfterViewInit, OnDestroy {
 
   public personList: Person[] = [];
 
-  private sub!: Subscription;
+  private apiSubscription!: Subscription;
   private apiService: ServiceAPI = inject(ServiceAPI);
   private coreService: CoreService = inject(CoreService);
 
   constructor() { }
 
   public ngAfterViewInit(): void {
-    this.sub = this.apiService.getStudents().subscribe((res: Person) => this.personList.push(res));
+    this.apiSubscription = this.apiService.getStudents()
+      .subscribe((res: Person) => this.personList.push(res));
     this.coreService.emit({ key: 'loader-state', value: false });
   }
 
@@ -32,6 +33,6 @@ export class StudentsComponent implements AfterViewInit, OnDestroy {
   }
 
   public ngOnDestroy(): void {
-    this.sub.unsubscribe();
+    this.apiSubscription.unsubscribe();
   }
 }

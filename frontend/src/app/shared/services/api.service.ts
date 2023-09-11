@@ -4,6 +4,7 @@ import { Observable, Observer } from "rxjs";
 import { Course } from "../model/course";
 import { CourseSub } from "../model/course.sub";
 import { Person } from "../model/person";
+import { environment } from "src/env/env";
 
 @Injectable({
     providedIn: 'root'
@@ -16,7 +17,7 @@ export class ServiceAPI {
     private ngZone: NgZone = inject(NgZone);
 
     constructor(private http: HttpClient) {
-        this.rootUrl = 'http://localhost:8080/';
+        this.rootUrl = environment.rootUrl;
         this.httpOptions = {
             headers: new HttpHeaders({
                 'Content-Type': 'application/x-ndjson'
@@ -49,14 +50,16 @@ export class ServiceAPI {
     };
 
     private initRequest(url: string): Observable<any> {
-        return new Observable<Person>((subscriber: Observer<any>) => {
-            const source: EventSource = new EventSource(url);
-            source.onmessage = (evt: MessageEvent) => this.ngZone.run(() => subscriber.next(JSON.parse(evt.data)));
-            source.onopen = (evt: Event) => console.log('[API SERVICE] - STREAM OPENED ');
-            source.onerror = (evt) => {
-                console.log('[API SERVICE] - STREAM CLOSED');
-                source.close();
-            };
+        return this.ngZone.runOutsideAngular(() => { // Server Side Rendering
+            return new Observable<Person>((subscriber: Observer<any>) => {
+                const source: EventSource = new EventSource(url);
+                source.onmessage = (evt: MessageEvent) => this.ngZone.run(() => subscriber.next(JSON.parse(evt.data)));
+                source.onopen = (evt: Event) => console.log('[API SERVICE] - STREAM OPENED ');
+                source.onerror = (evt) => {
+                    console.log('[API SERVICE] - STREAM CLOSED');
+                    source.close();
+                };
+            });
         });
     }
 }
